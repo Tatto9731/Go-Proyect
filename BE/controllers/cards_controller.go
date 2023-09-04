@@ -10,55 +10,56 @@ import (
 	"strings"
 )
 
-func GetCardAPI(name string)[] models.Card {
+//Get the cards from a public API and returns a list with all the results
+func GetCardFromAPI(name string)[] models.Card {
 	apiURL := "https://api.magicthegathering.io/v1/cards?name=" + name
 
-	// Realizar la solicitud GET a la API
+	//Creates the GET request
 	resp, err := http.Get(apiURL)
 	if err != nil {
-		fmt.Println("Error al realizar la solicitud:", err)
+		fmt.Println("Error trying to stablish the request:", err)
 	}
 	defer resp.Body.Close()
 
-	// Verificar el código de estado de la respuesta
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("La solicitud devolvió un código de estado no válido:", resp.Status)
+		fmt.Println("The request returns an invalid state:", resp.Status)
 	}
 
-	// Decodificar la respuesta JSON
+	// Decode the JSON
 	var cardResponse models.CardResponse
 	err = json.NewDecoder(resp.Body).Decode(&cardResponse)
 	if err != nil {
-		fmt.Println("Error al decodificar la respuesta JSON:", err)
+		fmt.Println("Error trying to decode the JSON:", err)
 	}
 
-	// Verificar si se encontraron cartas en la respuesta
 	if len(cardResponse.Cards) == 0 {
-		fmt.Println("No se encontraron cartas en la respuesta JSON")
+		fmt.Println("There are no cards with that name")
 	}
 
-	// Extraer los nombres de las cartas y mostrarlos
+	// Extract all the required information from the cards
 	var cards []models.Card
-	var p models.Card
-	for _, card := range cardResponse.Cards {
-		p.Name = card.Name
-		p.Text = card.Text
-		p.Number = card.Number
-		cards = append(cards, p)
+	var card models.Card
+	for _, cardTemp := range cardResponse.Cards {
+		card.Name = cardTemp.Name
+		card.Text = cardTemp.Text
+		card.Number = cardTemp.Number
+		cards = append(cards, card)
 	}
 	return cards
 }
 
+//Returns a card name from the view
 func SearchCard(w http.ResponseWriter, r *http.Request)string{
-	r.ParseForm() // Parsea los datos del formulario
+	r.ParseForm()
 
 	CardName := r.FormValue("CardName")
 
 	return CardName
 }
 
+//Add the selected card into the API from the view
 func AddCardForm(w http.ResponseWriter, r *http.Request){
-	r.ParseForm() // Parsea los datos del formulario
+	r.ParseForm()
 
 	CardName := r.FormValue("AddCardName")
 	CardText := r.FormValue("AddCardText")
@@ -81,59 +82,58 @@ func AddCardForm(w http.ResponseWriter, r *http.Request){
 	card.Deck_id = deck.ID
 	card.Number = CardNumber
 
-	// Convertir el objeto Usuario a JSON
+	// Turn the object into a JSON body
     jsonBody, err := json.Marshal(card)
     if err != nil {
-        fmt.Println("Error al convertir el objeto a JSON:", err)
+        fmt.Println("Error trying to convert into a JSON:", err)
         return
     }
 
-	// URL de tu API y cuerpo de la solicitud POST
     apiUrl := "http://localhost:8081/cards"
     requestBody := bytes.NewBuffer(jsonBody)
 
-	// Realizar la solicitud POST
+	// Stablish the POST request
     resp, err := http.Post(apiUrl, "application/json", requestBody)
     if err != nil {
-        fmt.Println("Error al realizar la solicitud POST:", err)
+        fmt.Println("Error trying to request the POST method:", err)
         return
     }
     defer resp.Body.Close()
 
-    // Verificar el código de estado de la respuesta
     if resp.StatusCode != http.StatusOK {
-        fmt.Println("La solicitud devolvió un código de estado no válido:", resp.Status)
+        fmt.Println("The request returns an invalid state:", resp.Status)
         return
     }
 
 	http.Redirect(w, r, "/"+commanderURL, http.StatusSeeOther)
 }
 
+//Get all the card from an specific deck using the API
 func GetCardsFromDeck(ID string)[]models.Card{
-	// URL de la API externa
+
     url := "http://localhost:8081/decks/"+ID+"/cards"
 
-    // Realiza una solicitud GET a la API
+    //Creates the GET request
     resp, err := http.Get(url)
     if err != nil {
-        fmt.Println("Error al realizar la solicitud:", err)
+        fmt.Println("Error creating the request:", err)
     }
     defer resp.Body.Close()
 
-    // Verifica el código de estado de la respuesta
     if resp.StatusCode != http.StatusOK {
         fmt.Println("La solicitud devolvió un código de estado no válido:", resp.Status)
     }
 
-    // Decodifica la respuesta JSON en tu objeto Go
+    // Decode the JSON into an object
     var cards []models.Card
     err = json.NewDecoder(resp.Body).Decode(&cards)
     if err != nil {
-        fmt.Println("Error al decodificar la respuesta JSON:", err)
+        fmt.Println("Error decoding the JSON:", err)
     }
 	return cards
 }
 
+//Get all the card info from the view using a form and the URL in order to delete it
 func DeleteCard(w http.ResponseWriter, r *http.Request){
 
 	CardNameTemp := strings.Split(strings.Split(r.URL.Path, "/")[4], "%20")
@@ -168,18 +168,19 @@ func DeleteCard(w http.ResponseWriter, r *http.Request){
 
 }
 
+//Deletes a card from the API
 func DeleteCardPage(ID string){
-	// URL de tu API para eliminar un usuario específico
+
     apiUrl := "http://localhost:8081/cards/" + ID
 
-    // Crear una solicitud HTTP DELETE
+    //Creates a DELETE request
     req, err := http.NewRequest("DELETE", apiUrl, nil)
     if err != nil {
         fmt.Println("Error al crear la solicitud DELETE:", err)
         return
     }
 
-    // Realizar la solicitud DELETE
+    // Stablish the DELETE request
     client := &http.Client{}
     resp, _ := client.Do(req)
     defer resp.Body.Close()

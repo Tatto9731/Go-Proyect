@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetAllUsersSQL(){
+func GetAllUsersInfoSQL(){
 
 	models.DeleteUsers()
 
@@ -270,10 +270,8 @@ func UpdateUserSQL(p models.User){
 	}
 	defer db.Close()
 
-	// Sentencia SQL para actualizar la fila
 	updateQuery := "UPDATE users SET name = ?, age = ?, email = ? WHERE id = ?"
 
-	// Ejecutar la sentencia SQL
 	_, err = db.Exec(updateQuery, p.Name, p.Age, p.Email, p.ID)
 	if err != nil {
 		log.Fatal(err)
@@ -287,10 +285,8 @@ func UpdateDeckSQL(p models.Deck){
 	}
 	defer db.Close()
 
-	// Sentencia SQL para actualizar la fila
 	updateQuery := "UPDATE decks SET commander = ?, powerlvl = ?, colors = ? WHERE id = ?"
 
-	// Ejecutar la sentencia SQL
 	_, err = db.Exec(updateQuery, p.Commander, p.Powerlvl, p.Colors, p.ID)
 	if err != nil {
 		log.Fatal(err)
@@ -307,7 +303,6 @@ func DeleteUserSQL(id int){
 
 	deleteQuery := "DELETE FROM users WHERE id = ?"
 
-	// Ejecutar la sentencia SQL
 	_, err = db.Exec(deleteQuery, id)
 	if err != nil {
 		log.Fatal(err)
@@ -324,7 +319,6 @@ func DeleteDeckSQL(id int){
 
 	deleteQuery := "DELETE FROM decks WHERE id = ?"
 
-	// Ejecutar la sentencia SQL
 	_, err = db.Exec(deleteQuery, id)
 	if err != nil {
 		log.Fatal(err)
@@ -341,7 +335,6 @@ func DeleteCardSQL(id int){
 
 	deleteQuery := "DELETE FROM cards WHERE id = ?"
 
-	// Ejecutar la sentencia SQL
 	_, err = db.Exec(deleteQuery, id)
 	if err != nil {
 		log.Fatal(err)

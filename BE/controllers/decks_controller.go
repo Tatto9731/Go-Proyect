@@ -2,200 +2,197 @@ package controllers
 
 import (
 	"FEModule/models"
-	"net/http"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
-	"strings"
+	"net/http"
 	"strconv"
+	"strings"
 )
 
-func GetDeckID(commander string)int{
-    var ID int
-    for i := 0; i < len(models.Users); i++ {
+func GetDeckID(commander string) int {
+	var ID int
+	for i := 0; i < len(models.Users); i++ {
 		for j := 0; j < len(models.Users[i].Decks); j++ {
-			if models.Users[i].Decks[j].Commander == commander{
-				ID = models.Users[i].Decks
+			if models.Users[i].Decks[j].Commander == commander {
+				ID = models.Users[i].Decks[j].ID
 			}
 		}
 	}
-    return ID
+	return ID
 }
 
+//Gets the deck info from the view using a form and add it to the API
 func AddDeckForm(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm() // Parsea los datos del formulario
+	r.ParseForm()
 
-	var p models.Deck
+	var deck models.Deck
 
 	commander := r.FormValue("AddCommander")
 	powerlvl := r.FormValue("AddPowerlvl")
 	colors := r.FormValue("AddColors")
 	user_id := r.FormValue("AddUser_id")
 
-	p.Commander, p.Powerlvl, p.Colors, p.User_id = commander, ConvertirSTR(powerlvl), colors, ConvertirSTR(user_id)
+	deck.Commander, deck.Powerlvl, deck.Colors, deck.User_id = commander, ConvertSTR(powerlvl), colors, ConvertSTR(user_id)
 
-	// Convertir el objeto Usuario a JSON
-    jsonBody, err := json.Marshal(p)
-    if err != nil {
-        fmt.Println("Error al convertir el objeto a JSON:", err)
-        return
-    }
+	// Convert the object into a JSON body
+	jsonBody, err := json.Marshal(deck)
+	if err != nil {
+		fmt.Println("Error trying to convert into JSON:", err)
+		return
+	}
 
-	// URL de tu API y cuerpo de la solicitud POST
-    apiUrl := "http://localhost:8081/decks"
-    requestBody := bytes.NewBuffer(jsonBody)
+	apiUrl := "http://localhost:8081/decks"
+	requestBody := bytes.NewBuffer(jsonBody)
 
-	// Realizar la solicitud POST
-    resp, err := http.Post(apiUrl, "application/json", requestBody)
-    if err != nil {
-        fmt.Println("Error al realizar la solicitud POST:", err)
-        return
-    }
-    defer resp.Body.Close()
+	// Request a POST method
+	resp, err := http.Post(apiUrl, "application/json", requestBody)
+	if err != nil {
+		fmt.Println("Error trying to create the POST request:", err)
+		return
+	}
+	defer resp.Body.Close()
 
-    // Verificar el código de estado de la respuesta
-    if resp.StatusCode != http.StatusOK {
-        fmt.Println("La solicitud devolvió un código de estado no válido:", resp.Status)
-        return
-    }
+	// Verificar el código de estado de la respuesta
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("The request returns an invalid state:", resp.Status)
+		return
+	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func RemoveDeckForm(w http.ResponseWriter, r *http.Request) {
+//Gets the commander info from the URL in order to delete the deck
+func RemoveDeck(w http.ResponseWriter, r *http.Request) {
 
 	commander := strings.Split(r.URL.Path, "/")[1]
 
-    DeleteDeckPage(strconv.Itoa(GetDeckID(commander)))
+	DeleteDeckPage(strconv.Itoa(GetDeckID(commander)))
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+//Gets the deck info from the view usign a form and the URL in order to update it
 func UpdateDeckForm(w http.ResponseWriter, r *http.Request) {
-    r.ParseForm()
-    commanderform := r.FormValue("UpdateCommander")
+	r.ParseForm()
+	commanderform := r.FormValue("UpdateCommander")
 	powerlvl := r.FormValue("UpdatePowerlvl")
 	colors := r.FormValue("UpdateColors")
 	var deck models.Deck
 
 	commanderURL := strings.Split(r.URL.Path, "/")[1]
 
+    //Find the deck into the user information
 	for i := 0; i < len(models.Users); i++ {
 		for j := 0; j < len(models.Users[i].Decks); j++ {
-			if models.Users[i].Decks[j].Commander == commanderURL{
+			if models.Users[i].Decks[j].Commander == commanderURL {
 				deck = models.Users[i].Decks[j]
 			}
 		}
 	}
-    deck.Commander = commanderform
-    deck.Powerlvl= ConvertirSTR(powerlvl)
-    deck.Colors=colors
-    PutDeckPage(deck)
+	deck.Commander = commanderform
+	deck.Powerlvl = ConvertSTR(powerlvl)
+	deck.Colors = colors
+	PutDeckPage(deck)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func GetDecksFromUser(ID string)[]models.Deck{
-	// URL de la API externa
-    url := "http://localhost:8081/decks/"+ID
+//Get the decks info from the API and returns a slice with all the decks
+func GetDecksFromUser(ID string) []models.Deck {
 
-    // Realiza una solicitud GET a la API
-    resp, err := http.Get(url)
-    if err != nil {
-        fmt.Println("Error al realizar la solicitud:", err)
-    }
-    defer resp.Body.Close()
+	url := "http://localhost:8081/decks/" + ID
 
-    // Verifica el código de estado de la respuesta
-    if resp.StatusCode != http.StatusOK {
-        fmt.Println("La solicitud devolvió un código de estado no válido:", resp.Status)
-    }
+	// Creates a GET request
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error creating the request:", err)
+	}
+	defer resp.Body.Close()
 
-    // Decodifica la respuesta JSON en tu objeto Go
-    var p []models.Deck
-    err = json.NewDecoder(resp.Body).Decode(&p)
-    if err != nil {
-        fmt.Println("Error al decodificar la respuesta JSON:", err)
-    }
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("The request returns an invalid state:", resp.Status)
+	}
+
+	var decks []models.Deck
+	err = json.NewDecoder(resp.Body).Decode(&decks)
+	if err != nil {
+		fmt.Println("Error decoding the JSON:", err)
+	}
+	return decks
+}
+
+//Gets all decks from all users from the API and returns a slice
+func GetAllDecks() []models.Deck {
+
+	url := "http://localhost:8081/users/decks"
+
+	//Creates the GET request
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error creating the request:", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("The request returns an invalid state:", resp.Status)
+	}
+
+	var p []models.Deck
+	err = json.NewDecoder(resp.Body).Decode(&p)
+	if err != nil {
+		fmt.Println("Error decoding the JSON:", err)
+	}
 	return p
 }
 
-func GetAllDecks()[]models.Deck{
-	// URL de la API externa
-    url := "http://localhost:8081/users/decks"
+//Deletes a deck using the API
+func DeleteDeckPage(ID string) {
 
-    // Realiza una solicitud GET a la API
-    resp, err := http.Get(url)
-    if err != nil {
-        fmt.Println("Error al realizar la solicitud:", err)
-    }
-    defer resp.Body.Close()
+	apiUrl := "http://localhost:8081/decks/" + ID
 
-    // Verifica el código de estado de la respuesta
-    if resp.StatusCode != http.StatusOK {
-        fmt.Println("La solicitud devolvió un código de estado no válido:", resp.Status)
-    }
+	//Creates a DELETE request
+	req, err := http.NewRequest("DELETE", apiUrl, nil)
+	if err != nil {
+		fmt.Println("Error creating the DELETE request:", err)
+		return
+	}
 
-    // Decodifica la respuesta JSON en tu objeto Go
-    var p []models.Deck
-    err = json.NewDecoder(resp.Body).Decode(&p)
-    if err != nil {
-        fmt.Println("Error al decodificar la respuesta JSON:", err)
-    }
-	return p
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
 }
 
-func DeleteDeckPage(ID string){
-	// URL de tu API para eliminar un usuario específico
-    apiUrl := "http://localhost:8081/decks/" + ID
+//Updates the deck information using the API
+func PutDeckPage(p models.Deck) {
+	// Convert the object into a JSON body
+	jsonBody, err := json.Marshal(p)
+	if err != nil {
+		fmt.Println("Error trying to convert into a JSON:", err)
+		return
+	}
 
-    // Crear una solicitud HTTP DELETE
-    req, err := http.NewRequest("DELETE", apiUrl, nil)
-    if err != nil {
-        fmt.Println("Error al crear la solicitud DELETE:", err)
-        return
-    }
+	apiUrl := "http://localhost:8081/decks/" + strconv.Itoa(p.ID)
 
-    // Realizar la solicitud DELETE
-    client := &http.Client{}
-    resp, _ := client.Do(req)
-    defer resp.Body.Close()
+	//Creates the PUT request
+	req, err := http.NewRequest("PUT", apiUrl, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		fmt.Println("Error creating the PUT request:", err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error trying to stablish the PUT request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("The PUT request returns an invalid state:", resp.Status)
+		return
+	}
 }
-
-func PutDeckPage(p models.Deck){
-	// Convertir el objeto Usuario a JSON
-    jsonBody, err := json.Marshal(p)
-    if err != nil {
-        fmt.Println("Error al convertir el objeto a JSON:", err)
-        return
-    }
-
-    // URL de tu API para actualizar un usuario específico
-    apiUrl := "http://localhost:8081/decks/" + strconv.Itoa(p.ID)
-
-    // Crear una solicitud HTTP PUT con el cuerpo JSON
-    req, err := http.NewRequest("PUT", apiUrl, bytes.NewBuffer(jsonBody))
-    if err != nil {
-        fmt.Println("Error al crear la solicitud PUT:", err)
-        return
-    }
-
-    // Establecer el encabezado de tipo de contenido JSON
-    req.Header.Set("Content-Type", "application/json")
-
-    // Realizar la solicitud PUT
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        fmt.Println("Error al realizar la solicitud PUT:", err)
-        return
-    }
-    defer resp.Body.Close()
-
-    // Verificar el código de estado de la respuesta
-    if resp.StatusCode != http.StatusOK {
-        fmt.Println("La solicitud PUT devolvió un código de estado no válido:", resp.Status)
-        return
-    }
-}
-

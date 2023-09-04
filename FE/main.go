@@ -8,19 +8,19 @@ import (
 )
 
 func main(){
-	//Crea un enrutador usando Gorilla Mux
+	//Create a router using Gorilla Mux
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", views.MainPage)
 	r.HandleFunc("/add", views.AddPage)
-	r.HandleFunc("/add/process", controllers.AddForm)
+	r.HandleFunc("/add/process", controllers.AddUserForm)
 	r.HandleFunc("/{id}/add/deck", views.AddDeckPage)
 	r.HandleFunc("/{id}/add/deck/process", controllers.AddDeckForm)
 	r.HandleFunc("/{id}/remove", views.RemovePage)
 	r.HandleFunc("/{commander}", views.DeckPage)
 	r.HandleFunc("/{commander}/remove/deck", views.RemoveDeckPage)
-	r.HandleFunc("/{commander}/remove/deck/process", controllers.RemoveDeckForm)
-	r.HandleFunc("/{id}/remove/process", controllers.RemoveForm)
+	r.HandleFunc("/{commander}/remove/deck/process", controllers.RemoveDeck)
+	r.HandleFunc("/{id}/remove/process", controllers.RemoveUser)
 	r.HandleFunc("/{id}/update", views.UpdatePage)
 	r.HandleFunc("/{id}/update/process", controllers.UpdateForm)
 	r.HandleFunc("/{commander}/update/deck", views.UpdateDeckPage)
@@ -30,6 +30,6 @@ func main(){
 	r.HandleFunc("/{commander}/remove/card/{name}", views.RemoveCardPage)
 	r.HandleFunc("/{commander}/remove/card/{name}/process", controllers.DeleteCard)
 	
-	// Inicia el servidor HTTP
+	// Inicialize the server HTTP
 	http.ListenAndServe(":8080", r)
 }

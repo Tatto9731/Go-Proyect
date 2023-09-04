@@ -1,5 +1,6 @@
 package models
 
+//Object that gets all the card information from the public API
 type CardResponse struct {
 	Cards []struct {
 		Name string `json:"name"`
@@ -8,6 +9,7 @@ type CardResponse struct {
 	} `json:"cards"`
 }
 
+//Object that is used to upload/download the information to my API
 type Card struct{
 	ID int `json:"id"`
 	Name string `json:"name"`

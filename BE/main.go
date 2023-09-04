@@ -9,7 +9,7 @@ import (
 )
 
 func main(){
-		//Crea un enrutador usando Gorilla Mux
+		//Create a router using Gorilla Mux
 		r := mux.NewRouter()
 
 		// Manejador para la ruta "/"
@@ -26,6 +26,6 @@ func main(){
 		r.HandleFunc("/decks/{id}", controllers.DeleteDeckAPI).Methods("DELETE")
 		r.HandleFunc("/cards/{id}", controllers.DeleteCardAPI).Methods("DELETE")
 		
-		// Inicia el servidor HTTP
+		// Inicialize the server HTTP
 		http.ListenAndServe(":8081", r)	
 }
