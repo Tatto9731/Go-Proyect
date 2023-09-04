@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create User</title>
+</head>
+<body>
+    <h1>Create User</h1>
+    <h3>Please enter the information below</h3>
+    <form action="/add/process" method="post">
+        <input type="text" name="AddName" placeholder="Name">
+        <input type="text" name="AddAge" placeholder="Age">
+        <input type="text" name="AddEmail" placeholder="Email">
+        <button type="submit">Create</button>
+    </form>
+</body>
+<body>
+    <button onclick="redirectToMain()">Back</button>
+    <script>
+         function redirectToMain() {
+           window.location.href = "/";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+github.com/MagicTheGathering/mtg-sdk-go v0.0.0-20190109105601-3aaea97721aa h1:OJtPSYA2qr4d+51NY3mR+cmpSvQoWSnTDjU0OkOtjg0=
+github.com/MagicTheGathering/mtg-sdk-go v0.0.0-20190109105601-3aaea97721aa/go.mod h1:N2gc+5YwVfphpjWbjtIfh8/XKQowEXSMNefQeyyQ/lk=
+github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
+github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
+github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
+github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+golang.org/x/example/hello v0.0.0-20230810185935-9fd7daa707c3 h1:sxVo7zRQvBTtgzzlwt6veETNzpN3fnVPr7lFhhgVc8w=
+golang.org/x/example/hello v0.0.0-20230810185935-9fd7daa707c3/go.mod h1:UhUKOXx5fMcLZxwL20DUrWWBBoRYG9Jvc8FiwZhRHCI=

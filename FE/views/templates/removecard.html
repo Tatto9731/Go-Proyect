@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remove Card</title>
+</head>
+<body>
+    {{range .Cards}}
+    <h1>Remove Card</h1>
+    <h3>Do you want to delete this card from the deck?</h3>
+    <button onclick="redirectToRemoveCard()">Accept</button>
+    <button onclick="redirectToMain()">Back</button>
+    <script>
+         function redirectToRemoveCard() {
+           window.location.href = "/{{$.Commander}}/remove/card/{{.Name}}/process";
+        }
+    </script>
+    <script>
+         function redirectToMain() {
+           window.location.href = "/";
+        }
+    </script>
+    {{end}}
+</body>
+</html>

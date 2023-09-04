@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cards List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{.Commander}}</h1>
+        <form style="margin-left: 0; margin-bottom: 10px;" action="/{{.Commander}}/add/card" method="post">
+            <input type="text" name="CardName" placeholder="Card name">
+            <input type="submit" value="Search Card">
+        </form>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="width: 70%;">Card</th>
+                    <th style="width: 30%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Cards}}
+                <tr>
+                    <td  style="text-align: center;">{{.Name}}</td>
+                    <td style="display: flex; position:relative">
+                        <button style="margin-left: 40%;" data-bs-toggle="collapse" data-bs-target="#card{{ .Number }}">More Info</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" id="card{{ .Number }}" class="collapse">
+                        <!-- Aquí puedes agregar la información adicional del usuario -->
+                        <div class="card">
+                            <div class="card-body">
+                              <h5 class="card-title">{{.Name}}</h5>
+                              <p class="card-text">{{.Text}}</p>
+                              <form style="margin-left: 0; margin-bottom: 10px;" action="/{{$.Commander}}/remove/card/{{.Name}}" method="post">
+                                <input type="hidden" name="RemoveCard" value="{{.Name}}">
+                                <input type="submit" value="Remove Card">
+                            </form>
+                            </div>
+                          </div>
+                          <br/>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</body>
+<head>
+    <title>Add button</title>
+</head>
+    <style>
+        body {
+            height: 100vh; /* Opcional para ocupar toda la altura de la ventana */
+            margin: 0;
+        }
+        
+        button {
+            text-align: center;
+            margin: auto;
+        }
+    </style>
+    <div style="text-align: center;">
+        <h3>Actions</h3>
+        <button onclick="redirectToMain()">Back</button>
+        <button onclick="redirectToUpdateDeck()">Update Deck</button>
+        <button onclick="redirectToRemoveDeck()">Delete Deck</button>
+    </div>
+    <script>
+        function redirectToMain() {
+          window.location.href = "/";
+        }
+        function redirectToRemoveDeck() {
+            window.location.href = "/{{.Commander}}/remove/deck";
+        }
+        function redirectToUpdateDeck() {
+            window.location.href = "/{{.Commander}}/update/deck";
+        }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</html>

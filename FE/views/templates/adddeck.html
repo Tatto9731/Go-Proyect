@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Deck</title>
+</head>
+<body>
+    <h1>Create Deck</h1>
+    <h3>Please enter the information below</h3>
+    <form action="/{{.ID}}/add/deck/process" method="post">
+        <input type="text" name="AddCommander" placeholder="Name">
+        <input type="text" name="AddPowerlvl" placeholder="Power level">
+        <input type="text" name="AddColors" placeholder="Color identity">
+        <input type="hidden" name="AddUser_id" value="{{.ID}}">
+        <input type="submit" value="Add Deck">
+    </form>
+</body>
+<body>
+    <button onclick="redirectToMain()">Back</button>
+    <script>
+         function redirectToMain() {
+           window.location.href = "/";
+        }
+    </script>
+</body>
+</html>
